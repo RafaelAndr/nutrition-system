@@ -2,8 +2,10 @@ package com.nutrition_system.patient.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +28,10 @@ public class Patient {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @Column(name = "registration_date")
+    @CreationTimestamp
+    private LocalDateTime registrationDate;
 
     @JoinColumn(name = "address_id")
     @OneToOne(cascade = CascadeType.ALL)
