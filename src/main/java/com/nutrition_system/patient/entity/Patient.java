@@ -1,16 +1,17 @@
 package com.nutrition_system.patient.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
 @Table(name = "patient")
+@Data
 public class Patient {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 

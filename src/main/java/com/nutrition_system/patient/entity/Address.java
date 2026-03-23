@@ -1,11 +1,13 @@
 package com.nutrition_system.patient.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "Address")
+@Data
 public class Address {
 
     @Id
