@@ -1,4 +1,4 @@
-package com.nutrition_system.entity;
+package com.nutrition_system.patient.entity;
 
 import jakarta.persistence.*;
 
@@ -25,4 +25,8 @@ public class Patient {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @JoinColumn(name = "address_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    private Address address;
 }
