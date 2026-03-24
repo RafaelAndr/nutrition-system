@@ -1,6 +1,5 @@
-package com.nutrition_system.patient.dto.resquest;
+package com.nutrition_system.dto.resquest;
 
-import com.nutrition_system.patient.entity.Address;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.br.CPF;
 

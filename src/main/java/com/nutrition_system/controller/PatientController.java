@@ -1,8 +1,8 @@
-package com.nutrition_system.patient.controller;
+package com.nutrition_system.controller;
 
-import com.nutrition_system.patient.dto.response.PatientResponseDto;
-import com.nutrition_system.patient.dto.resquest.PatientRequestDto;
-import com.nutrition_system.patient.service.PatientService;
+import com.nutrition_system.dto.response.PatientResponseDto;
+import com.nutrition_system.dto.resquest.PatientRequestDto;
+import com.nutrition_system.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

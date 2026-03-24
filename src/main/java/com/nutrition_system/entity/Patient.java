@@ -1,4 +1,4 @@
-package com.nutrition_system.patient.entity;
+package com.nutrition_system.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.nutrition_system.patient.dto.resquest;
+package com.nutrition_system.dto.resquest;
 
 public record AddressRequestDto(
         String street,

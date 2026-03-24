@@ -1,4 +1,4 @@
-package com.nutrition_system.patient.dto.response;
+package com.nutrition_system.dto.response;
 
 import java.time.LocalDate;
 import java.util.UUID;
