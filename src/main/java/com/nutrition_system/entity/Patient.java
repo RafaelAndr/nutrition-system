@@ -20,7 +20,7 @@ public class Patient {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "cpf")
+    @Column(name = "cpf", updatable = false)
     private String cpf;
 
     @Column(name = "telephone")
@@ -29,7 +29,7 @@ public class Patient {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", updatable = false)
     @CreationTimestamp
     private LocalDateTime registrationDate;
 
