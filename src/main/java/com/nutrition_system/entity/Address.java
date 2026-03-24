@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Address")
+@Table(name = "address")
 @Data
 public class Address {
 
