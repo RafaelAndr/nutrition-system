@@ -5,13 +5,11 @@ import com.nutrition_system.dto.resquest.PatientRequestDto;
 import com.nutrition_system.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/patients")
@@ -31,5 +29,14 @@ public class PatientController {
                 .buildAndExpand(patientResponseDto.id()).toUri();
 
         return ResponseEntity.created(uri).body(patientResponseDto);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<PatientResponseDto> updatePatient(@RequestBody PatientRequestDto patientRequestDto, @PathVariable UUID id){
+
+        patientService.updatePatient(patientRequestDto, id);
+
+        return ResponseEntity.noContent().build();
+
     }
 }
