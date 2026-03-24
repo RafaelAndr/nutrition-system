@@ -2,6 +2,7 @@ package com.nutrition_system.controller;
 
 import com.nutrition_system.dto.response.PatientResponseDto;
 import com.nutrition_system.dto.resquest.PatientRequestDto;
+import com.nutrition_system.entity.Patient;
 import com.nutrition_system.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -46,4 +48,10 @@ public class PatientController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("{id}")
+    public ResponseEntity<PatientResponseDto> getDetails(@PathVariable UUID id) {
+        return ResponseEntity.ok(patientService.getDetails(id));
+    }
+
 }

@@ -8,6 +8,7 @@ import com.nutrition_system.exception.DuplicatedCpfException;
 import com.nutrition_system.mapper.AddressMapper;
 import com.nutrition_system.mapper.PatientMapper;
 import com.nutrition_system.repository.PatientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,11 @@ public class PatientService {
         patientRepository.deleteById(id);
     }
 
+    public PatientResponseDto getDetails(UUID id){
+        Optional<Patient> patientOptional =  patientRepository.findById(id);
+
+        return patientOptional.map(patientMapper::toDto).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+    }
 
     private void checkDuplicatedCpf(String cpf){
         if (patientRepository.existsByCpf(cpf)) {
