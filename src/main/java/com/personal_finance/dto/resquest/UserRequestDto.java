@@ -1,7 +1,10 @@
 package com.personal_finance.dto.resquest;
 
+import com.personal_finance.entity.enums.Role;
+
 public record UserRequestDto(
         String username,
-        String password
+        String password,
+        Role role
 ) {
 }
