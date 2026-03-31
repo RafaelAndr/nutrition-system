@@ -3,6 +3,7 @@ package com.personal_finance.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -22,5 +23,5 @@ public class Account {
     private String bankName;
 
     @Column(name = "balance")
-    private String balance;
+    private BigDecimal balance;
 }

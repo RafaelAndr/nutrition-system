@@ -1,8 +1,9 @@
 package com.personal_finance.controller;
 
 import com.personal_finance.dto.account.AccountBalanceDto;
-import com.personal_finance.dto.response.AccountResponseDto;
-import com.personal_finance.dto.resquest.AccountRequestDto;
+import com.personal_finance.dto.account.AccountResponseDto;
+import com.personal_finance.dto.account.AccountRequestDto;
+import com.personal_finance.dto.account.UpdateBalanceDto;
 import com.personal_finance.entity.Account;
 import com.personal_finance.mapper.AccountMapper;
 import com.personal_finance.service.AccountService;
@@ -44,5 +45,19 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<List<AccountBalanceDto>> getBalanceOfAllAccounts(){
         return ResponseEntity.ok(accountService.getBalanceOfAllAccounts());
+    }
+
+    @PostMapping("/addAmount/{id}")
+    public ResponseEntity<Void> addAmount(@PathVariable UUID id, @RequestBody UpdateBalanceDto updateBalanceDto){
+        accountService.addAmount(id, updateBalanceDto);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/removeAmount/{id}")
+    public ResponseEntity<Void> removeAmount(@PathVariable UUID id, @RequestBody UpdateBalanceDto updateBalanceDto){
+        accountService.removeAmount(id, updateBalanceDto);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-package com.personal_finance.dto.response;
+package com.personal_finance.dto.account;
 
 import java.util.UUID;
 
