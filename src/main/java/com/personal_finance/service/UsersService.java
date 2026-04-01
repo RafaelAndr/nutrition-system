@@ -1,7 +1,5 @@
 package com.personal_finance.service;
 
-import com.personal_finance.dto.response.UserResponseDto;
-import com.personal_finance.dto.resquest.UserRequestDto;
 import com.personal_finance.entity.Users;
 import com.personal_finance.entity.enums.Role;
 import com.personal_finance.mapper.UserMapper;
@@ -23,7 +21,7 @@ public class UsersService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional //só precisa usar transaction quando há mais de uma operação no metodo
+    @Transactional
     public Users save(Users user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return usersRepository.save(user);
