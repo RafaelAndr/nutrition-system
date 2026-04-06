@@ -25,6 +25,9 @@ public class Expense {
     @Column(name = "value")
     private BigDecimal value;
 
+    @Column(name = "paid")
+    private boolean paid;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "expense_category")
     private ExpenseCategory expenseCategory;
