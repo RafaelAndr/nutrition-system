@@ -26,4 +26,8 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
 }

@@ -11,7 +11,9 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    public void save(Payment payment){
+    public void payExpense(Payment payment){
         paymentRepository.save(payment);
     }
+
+
 }
