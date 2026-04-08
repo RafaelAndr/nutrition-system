@@ -3,8 +3,6 @@ package com.personal_finance.controller;
 import com.personal_finance.dto.expense.ExpenseRequestDto;
 import com.personal_finance.dto.expense.ExpenseResponseDto;
 import com.personal_finance.dto.payment.PaymentRequestDto;
-import com.personal_finance.entity.Expense;
-import com.personal_finance.entity.enums.PaymentMethod;
 import com.personal_finance.mapper.ExpenseMapper;
 import com.personal_finance.service.ExpenseService;
 import jakarta.validation.Valid;

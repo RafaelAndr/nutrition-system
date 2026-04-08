@@ -7,11 +7,10 @@ import com.personal_finance.entity.Account;
 import com.personal_finance.entity.Expense;
 import com.personal_finance.entity.Payment;
 import com.personal_finance.entity.Users;
-import com.personal_finance.entity.enums.PaymentMethod;
-import com.personal_finance.exception.AccessDeniedException;
 import com.personal_finance.exception.AccessForbiddenException;
 import com.personal_finance.exception.ExpenseAlreadyPaidException;
 import com.personal_finance.exception.ExpenseNegativeException;
+import com.personal_finance.exception.InsufficientBalanceException;
 import com.personal_finance.mapper.ExpenseMapper;
 import com.personal_finance.repository.ExpenseRepository;
 import com.personal_finance.security.SecurityService;
@@ -42,6 +41,9 @@ public class ExpenseService {
             throw new ExpenseNegativeException("You can't register a negative or zero expense value");
         }
 
+        Expense expense = expenseMapper.toEntity(expenseRequestDto);
+        expense.setUser(userLoggedIn);
+
         if (expenseRequestDto.accountId() != null){
             Account account = accountService.searchById(expenseRequestDto.accountId());
 
@@ -49,14 +51,9 @@ public class ExpenseService {
                 throw new AccessForbiddenException("You can't register an expense to an account it is not yours");
             }
 
-            Expense expense = expenseMapper.toEntity(expenseRequestDto);
             expense.setAccount(account);
-            expense.setUser(userLoggedIn);
             return expenseMapper.toDto(expenseRepository.save(expense));
         }
-
-        Expense expense = expenseMapper.toEntity(expenseRequestDto);
-        expense.setUser(userLoggedIn);
 
         return expenseMapper.toDto(expenseRepository.save(expense));
     }
@@ -92,12 +89,18 @@ public class ExpenseService {
         payment.setPaymentMethod(paymentRequestDto.paymentMethod());
 
         Account account = accountService.searchById(expense.getAccount().getId());
+
+        if (account.getBalance().compareTo(expense.getValue()) < 0){
+            throw new InsufficientBalanceException("Your balance are to small for this payment, your balance: R$" + account.getBalance() + " expense value: R$" + expense.getValue());
+        }
+
         account.setBalance(account.getBalance().subtract(expense.getValue()));
 
+        payment.setAccount(account);
         expense.setPaid(true);
 
         accountService.save(account);
-        paymentService.save(payment);
+        paymentService.payExpense(payment);
         expenseRepository.save(expense);
     }
 

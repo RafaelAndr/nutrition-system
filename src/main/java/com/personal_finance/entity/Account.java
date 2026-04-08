@@ -31,4 +31,7 @@ public class Account {
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<Income> incomes;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<Payment> payments;
 }
