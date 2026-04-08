@@ -113,6 +113,18 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(InsufficientBalanceException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ProblemDetail InsufficientBalanceException(InsufficientBalanceException e){
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        problemDetail.setTitle("Business rule violation");
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setDetail(e.getMessage());
+
+        return problemDetail;
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ProblemDetail handleEntityNotFoundException(EntityNotFoundException e){
