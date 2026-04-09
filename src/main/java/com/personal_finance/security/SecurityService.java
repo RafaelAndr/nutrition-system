@@ -1,7 +1,9 @@
 package com.personal_finance.security;
 
 import com.personal_finance.entity.Users;
+import com.personal_finance.repository.UsersRepository;
 import com.personal_finance.service.UsersService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,13 +14,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SecurityService {
 
-    private final UsersService usersService;
+    private final UsersRepository usersRepository;
 
     public Users getUserLoggedIn(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
 
-        return usersService.searchByUsername(username);
+        return usersRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Username '%s' not found", username)));
     }
 }
