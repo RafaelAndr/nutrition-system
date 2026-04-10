@@ -2,15 +2,15 @@ package com.personal_finance.service;
 
 import com.personal_finance.dto.user.LoginUserDto;
 import com.personal_finance.dto.user.UserRequestDto;
-import com.personal_finance.entity.Users;
-import com.personal_finance.exception.UserAlreadyExistsException;
 import com.personal_finance.mapper.UserMapper;
 import com.personal_finance.repository.UsersRepository;
 import com.personal_finance.security.JwtToken;
-import com.personal_finance.security.JwtUserDetailsService;
+import com.personal_finance.security.JwtService;
+import com.personal_finance.security.JwtUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,27 +19,25 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UsersRepository usersRepository;
-    private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final JwtService jwtService;
     private final UsersService usersService;
 
-    public JwtToken authenticate(LoginUserDto loginUserDto) {
+    public JwtToken login(LoginUserDto dto) {
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUserDto.username(), loginUserDto.password());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(dto.username(), dto.password())
+        );
 
-        authenticationManager.authenticate(authenticationToken);
+        JwtUserDetails user = (JwtUserDetails) authentication.getPrincipal();
 
-        return jwtUserDetailsService.getTokenAuthenticated(loginUserDto.username());
+        String token = jwtService.generateToken(user);
+
+        return new JwtToken(token);
     }
 
     @Transactional
     public void register(UserRequestDto userRequestDto) {
         usersService.register(userRequestDto);
     }
-
-
 }

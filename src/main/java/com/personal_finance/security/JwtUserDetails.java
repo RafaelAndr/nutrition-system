@@ -2,11 +2,9 @@ package com.personal_finance.security;
 
 import com.personal_finance.entity.Users;
 import com.personal_finance.entity.enums.Role;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.Collection;
 import java.util.UUID;
 
 public class JwtUserDetails extends User {
