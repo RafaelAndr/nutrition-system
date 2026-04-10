@@ -1,5 +1,6 @@
 package com.personal_finance.service;
 
+import com.personal_finance.dto.account.AccountRequestDto;
 import com.personal_finance.dto.expense.ExpenseRequestDto;
 import com.personal_finance.dto.expense.ExpenseResponseDto;
 import com.personal_finance.dto.payment.PaymentRequestDto;
@@ -11,6 +12,7 @@ import com.personal_finance.exception.AccessForbiddenException;
 import com.personal_finance.exception.ExpenseAlreadyPaidException;
 import com.personal_finance.exception.ExpenseNegativeException;
 import com.personal_finance.exception.InsufficientBalanceException;
+import com.personal_finance.mapper.AccountMapper;
 import com.personal_finance.mapper.ExpenseMapper;
 import com.personal_finance.repository.ExpenseRepository;
 import com.personal_finance.security.SecurityService;

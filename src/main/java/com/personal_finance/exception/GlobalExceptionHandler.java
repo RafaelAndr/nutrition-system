@@ -3,6 +3,7 @@ package com.personal_finance.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,6 +38,19 @@ public class GlobalExceptionHandler {
 
         problemDetail.setTitle("Invalid request data");
         problemDetail.setProperty("errors", errors);
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ProblemDetail handleInvalidJson(HttpMessageNotReadableException e){
+
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+
+        problemDetail.setTitle("Invalid Json");
+        problemDetail.setDetail("Request body is malformed");
+        problemDetail.setType(URI.create("https://api.coderbank.com.br"));
 
         return problemDetail;
     }
@@ -125,13 +139,13 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ExceptionHandler(EntityAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ProblemDetail UserAlreadyExistsException(UserAlreadyExistsException e){
+    public ProblemDetail entityAlreadyExistsException(EntityAlreadyExistsException e){
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/entity_alrealdy_exists"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;

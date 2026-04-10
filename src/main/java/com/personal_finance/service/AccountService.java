@@ -1,9 +1,14 @@
 package com.personal_finance.service;
+
 import com.personal_finance.dto.account.AccountBalanceDto;
+import com.personal_finance.dto.account.AccountRequestDto;
+import com.personal_finance.dto.account.AccountTotalBalanceDto;
 import com.personal_finance.dto.account.UpdateBalanceDto;
 import com.personal_finance.entity.Account;
 import com.personal_finance.entity.Users;
+import com.personal_finance.exception.AccessForbiddenException;
 import com.personal_finance.exception.AccountHasNoUserException;
+import com.personal_finance.exception.EntityAlreadyExistsException;
 import com.personal_finance.repository.AccountRepository;
 import com.personal_finance.security.SecurityService;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,6 +30,12 @@ public class AccountService {
     public Account save(Account account){
         Users userLogged = securityService.getUserLoggedIn();
         account.setUser(userLogged);
+
+        if (existBankName(account.getBankName())){
+            throw new EntityAlreadyExistsException("Bank name already exists");
+        }
+
+        account.setBalance(BigDecimal.ZERO);
         return accountRepository.save(account);
     }
 
@@ -34,10 +45,22 @@ public class AccountService {
         );
     }
 
+    private boolean existBankName(String bankName){
+        return accountRepository.existsByBankName(bankName);
+    }
+
+    public void editBankName(UUID accountId, AccountRequestDto accountRequestDto){
+        Account account = searchById(accountId);
+
+        account.setBankName(accountRequestDto.bankName());
+
+        accountRepository.save(account);
+    }
+
     public void delete(UUID id) throws AccessDeniedException{
         Users userLoggedIn = securityService.getUserLoggedIn();
 
-        Account account = accountRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Account not found " + id));
+        Account account = searchById(id);
 
         if (account.getUser() == null){
             throw new AccountHasNoUserException("Account has no user associated");
@@ -50,7 +73,7 @@ public class AccountService {
         accountRepository.deleteById(id);
     }
 
-    public List<AccountBalanceDto> getBalanceOfAllAccounts(){
+    public List<AccountBalanceDto> getUserAccounts(){
         Users userLoggedIn = securityService.getUserLoggedIn();
 
         List<Account> accounts = accountRepository.findByUser(userLoggedIn);
@@ -60,13 +83,25 @@ public class AccountService {
                 .toList();
     }
 
+    public AccountTotalBalanceDto getTotalUserBalance(){
+        Users userLoggedIn = securityService.getUserLoggedIn();
+
+        List<Account> accounts = accountRepository.findByUser(userLoggedIn);
+
+        BigDecimal total = accounts.stream()
+                .map(account -> account.getBalance() != null ? account.getBalance() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new AccountTotalBalanceDto(total);
+    }
+
     public void addAmount(UUID id, UpdateBalanceDto updateBalanceDto){
         Users userLoggedIn = securityService.getUserLoggedIn();
 
-        Account account = accountRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Account with id: " + id + " not found"));
+        Account account = searchById(id);
 
         if (!account.getUser().getId().equals(userLoggedIn.getId())){
-            throw new AccountHasNoUserException("You are not allowed");
+            throw new AccessForbiddenException("You can't deposit to this account");
         }
 
         BigDecimal newAmount = account.getBalance().add(updateBalanceDto.amount());
@@ -78,10 +113,14 @@ public class AccountService {
     public void removeAmount(UUID id, UpdateBalanceDto updateBalanceDto){
         Users userLoggedIn = securityService.getUserLoggedIn();
 
-        Account account = accountRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Account with id: " + id + " not found"));
+        Account account = searchById(id);
 
         if (!account.getUser().getId().equals(userLoggedIn.getId())){
-            throw new AccountHasNoUserException("You are not allowed");
+            throw new AccessForbiddenException("You can't withdraw from this account");
+        }
+
+        if (account.getBalance().compareTo(updateBalanceDto.amount()) < 0){
+            throw new AccessForbiddenException("Account has no sufficient amount");
         }
 
         BigDecimal newAmount = account.getBalance().subtract(updateBalanceDto.amount());

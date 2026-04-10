@@ -6,7 +6,7 @@ import com.personal_finance.dto.user.UserResponseDto;
 import com.personal_finance.entity.Users;
 import com.personal_finance.entity.enums.Role;
 import com.personal_finance.exception.AccessForbiddenException;
-import com.personal_finance.exception.UserAlreadyExistsException;
+import com.personal_finance.exception.EntityAlreadyExistsException;
 import com.personal_finance.mapper.UserMapper;
 import com.personal_finance.repository.UsersRepository;
 import com.personal_finance.security.SecurityService;
@@ -32,7 +32,7 @@ public class UsersService {
     public Users register(UserRequestDto userRequestDto) {
 
         if (usersRepository.existsByUsername(userRequestDto.username())) {
-            throw new UserAlreadyExistsException("User already exists");
+            throw new EntityAlreadyExistsException("User already exists");
         }
 
         if (!userRequestDto.password().equals(userRequestDto.confirmPassword())) {
