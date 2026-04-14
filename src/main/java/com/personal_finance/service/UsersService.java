@@ -29,7 +29,7 @@ public class UsersService {
     private final SecurityService securityService;
 
     @Transactional
-    public Users register(UserRequestDto userRequestDto) {
+    public void register(UserRequestDto userRequestDto) {
 
         if (usersRepository.existsByUsername(userRequestDto.username())) {
             throw new EntityAlreadyExistsException("User already exists");
@@ -43,15 +43,15 @@ public class UsersService {
         user.setName(userRequestDto.name());
         user.setUsername(userRequestDto.username());
         user.setPassword(passwordEncoder.encode(userRequestDto.password()));
-        user.setRole(userRequestDto.role());
+        user.setRole(Role.ROLE_CLIENT);
 
-        return usersRepository.save(user);
+        usersRepository.save(user);
     }
 
     @Transactional(readOnly = true)
     public Users searchById(UUID id) {
         return usersRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("User not found")
+                () -> new EntityNotFoundException("User not found")
         );
     }
 
@@ -61,12 +61,6 @@ public class UsersService {
         return userMapper.toDto(usersRepository.findById(userLoggedIn.getId()).orElseThrow(() -> new EntityNotFoundException("User not found")));
     }
 
-    @Transactional
-    public Users editPassword(UUID id, String password) {
-        Users user = searchById(id);
-        user.setPassword(password);
-        return user;
-    }
 
     @Transactional
     public void changePassword(ChangePasswordDto dto) {
