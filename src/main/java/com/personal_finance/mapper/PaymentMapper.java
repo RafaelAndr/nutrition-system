@@ -1,6 +1,7 @@
 package com.personal_finance.mapper;
 
 import com.personal_finance.dto.payment.PaymentRequestDto;
+import com.personal_finance.dto.payment.PaymentResponseDto;
 import com.personal_finance.entity.Payment;
 import org.mapstruct.Mapper;
 
@@ -9,4 +10,5 @@ public interface PaymentMapper {
 
     Payment toEntity(PaymentRequestDto paymentExpenseRequestDto);
 
+    PaymentResponseDto toDto(Payment payment);
 }
