@@ -1,6 +1,7 @@
 package com.personal_finance.entity;
 
 import com.personal_finance.entity.enums.IncomeCategory;
+import com.personal_finance.exception.AccessForbiddenException;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -36,4 +37,14 @@ public class Income {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
+
+    public void validateOwnership(UUID userId){
+        if (this.user == null){
+            throw new EntityNotFoundException("Income has no user associated");
+        }
+
+        if (!this.user.getId().equals(userId)){
+            throw new AccessForbiddenException("You can't access this income");
+        }
+    }
 }

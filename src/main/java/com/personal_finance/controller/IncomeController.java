@@ -2,8 +2,8 @@ package com.personal_finance.controller;
 
 import com.personal_finance.dto.income.IncomeRequestDto;
 import com.personal_finance.dto.income.IncomeResponseDto;
-import com.personal_finance.entity.Income;
 import com.personal_finance.service.IncomeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class IncomeController {
     private final IncomeService incomeService;
 
     @PostMapping
-    public ResponseEntity<IncomeResponseDto> createIncome(@RequestBody IncomeRequestDto incomeRequestDto){
+    public ResponseEntity<IncomeResponseDto> createIncome(@RequestBody @Valid IncomeRequestDto incomeRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(incomeService.save(incomeRequestDto));
     }
 
