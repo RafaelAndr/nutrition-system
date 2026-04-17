@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,13 +23,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleValidation(MethodArgumentNotValidException e){
 
-        Map<String, String> errors = e
-                .getBindingResult()
+        Map<String, List<String>> errors = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .collect(Collectors.toMap(
+                .collect(Collectors.groupingBy(
                         FieldError::getField,
-                        FieldError::getDefaultMessage
+                        Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
                 ));
 
         var problemDetail = ProblemDetail.forStatusAndDetail(
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/errors/account-no-user"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/errors/expense-already-paid"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/errors/negative-value"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/errors/access-forbidden"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;
@@ -109,7 +109,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/errros/insufficient-balance"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;
@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
 
         problemDetail.setTitle("Business rule violation");
-        problemDetail.setType(URI.create("https://api.spring-finance.com.br/erros/account-no-user"));
+        problemDetail.setType(URI.create("https://api.spring-finance.com.br/errors/entity-not-found"));
         problemDetail.setDetail(e.getMessage());
 
         return problemDetail;
