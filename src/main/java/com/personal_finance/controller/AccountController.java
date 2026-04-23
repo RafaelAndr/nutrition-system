@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,11 +32,7 @@ public class AccountController {
     @PostMapping
     @Operation(summary = "Create account", description = "Register new account")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Account successfully registered",
-                    content = @Content(schema = @Schema(implementation = AccountResponseDto.class))
-            ),
+            @ApiResponse(responseCode = "201", description = "Account successfully registered", content = @Content(schema = @Schema(implementation = AccountResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "409", description = "Account already registered")
     })
@@ -49,8 +44,8 @@ public class AccountController {
             )
             AccountRequestDto accountRequestDto
     ){
-        Account createdAccount = accountService.save(accountMapper.toEntity(accountRequestDto));
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountMapper.toDto(createdAccount));
+        AccountResponseDto createdAccount = accountService.save(accountRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
 
     @GetMapping("{id}")
@@ -59,22 +54,9 @@ public class AccountController {
             description = "Retrieve detailed information of an account by its ID"
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Account retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = AccountResponseDto.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad request"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Account not found"
-            )
+            @ApiResponse(responseCode = "200", description = "Account retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
     })
     public ResponseEntity<AccountResponseDto> getById(
             @Parameter(description = "Account ID", required = true)
@@ -87,30 +69,13 @@ public class AccountController {
     @PatchMapping("{id}")
     @Operation(summary = "Update account bank name")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Bank name updated successfully"
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad request"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Account not found"
-            )
+            @ApiResponse(responseCode = "204", description = "Bank name updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
     })
     public ResponseEntity<Void> editBankName(
-            @Parameter(description = "Account ID", required = true)
-            @PathVariable UUID id,
-
-            @RequestBody
-            @Valid
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "New bank name data",
-                    required = true
-            )
-            AccountRequestDto accountRequestDto
+            @Parameter(description = "Account ID", required = true) @PathVariable UUID id,
+            @RequestBody @Valid @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "New bank name data", required = true) AccountRequestDto accountRequestDto
     ){
         accountService.editBankName(id, accountRequestDto);
         return ResponseEntity.noContent().build();
@@ -118,18 +83,9 @@ public class AccountController {
 
     @Operation(summary = "Delete an account by ID")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Account deleted successfully"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Access forbidden"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Account not found"
-            )
+            @ApiResponse(responseCode = "204", description = "Account deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "Access forbidden"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
     })
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@Parameter(description = "Account ID", required = true) @PathVariable UUID id) {
@@ -137,19 +93,39 @@ public class AccountController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Get all user accounts")
+    @Operation(
+            summary = "Get all user accounts",
+            description = "Returns all accounts belonging to the authenticated user, including their current balances"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accounts retrieved successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - access denied")
+    })
     @GetMapping
     public ResponseEntity<List<AccountBalanceDto>> getUserAccounts(){
         return ResponseEntity.ok(accountService.getUserAccounts());
     }
 
-    @Operation(summary = "Get total balance of user account")
+    @Operation(
+            summary = "Get total balance of user accounts",
+            description = "Returns the total balance across all accounts for the authenticated user"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Total balance retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - user not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - access denied")
+    })
     @GetMapping("/total-balance")
     public ResponseEntity<AccountTotalBalanceDto> getTotalUserBalance(){
         return ResponseEntity.ok(accountService.getTotalUserBalance());
     }
 
     @Operation(summary = "Deposit a value in the account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Balance successfully deposited"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - user not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - access denied")
+    })
     @PatchMapping("/accounts/{id}/balance/deposit")
     public ResponseEntity<Void> addAmount(@PathVariable UUID id, @RequestBody UpdateBalanceDto updateBalanceDto){
         accountService.addAmount(id, updateBalanceDto);

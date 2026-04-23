@@ -1,12 +1,10 @@
 package com.personal_finance.service;
 
-import com.personal_finance.dto.account.AccountBalanceDto;
-import com.personal_finance.dto.account.AccountRequestDto;
-import com.personal_finance.dto.account.AccountTotalBalanceDto;
-import com.personal_finance.dto.account.UpdateBalanceDto;
+import com.personal_finance.dto.account.*;
 import com.personal_finance.entity.Account;
 import com.personal_finance.entity.Users;
 import com.personal_finance.exception.EntityAlreadyExistsException;
+import com.personal_finance.mapper.AccountMapper;
 import com.personal_finance.repository.AccountRepository;
 import com.personal_finance.security.SecurityService;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,13 +21,15 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final SecurityService securityService;
+    private final AccountMapper accountMapper;
 
     private Users getLoggedUser(){
         return securityService.getUserLoggedIn();
     }
 
-    public Account save(Account account){
+    public AccountResponseDto save(AccountRequestDto accountRequestDto){
         Users userLogged = getLoggedUser();
+        Account account = accountMapper.toEntity(accountRequestDto);
         account.setUser(userLogged);
 
         if (existBankNameWithUser(account.getBankName())){
@@ -37,7 +37,7 @@ public class AccountService {
         }
 
         account.setBalance(BigDecimal.ZERO);
-        return accountRepository.save(account);
+        return accountMapper.toDto(accountRepository.save(account));
     }
 
     public Account searchById(UUID id) {
