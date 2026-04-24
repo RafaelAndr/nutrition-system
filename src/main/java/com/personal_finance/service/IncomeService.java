@@ -10,11 +10,13 @@ import com.personal_finance.repository.IncomeRepository;
 import com.personal_finance.security.SecurityService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IncomeService {
@@ -31,17 +33,25 @@ public class IncomeService {
     public IncomeResponseDto save(IncomeRequestDto incomeRequestDto){
         Users userLoggedIn = getLoggedUser();
 
+        log.info("Starting expense creation for userId={}", userLoggedIn.getId());
+
         Income income = incomeMapper.toEntity(incomeRequestDto);
         income.setUser(userLoggedIn);
 
         if (incomeRequestDto.accountId() != null) {
+            log.info("Fetching accountId={} for userId={}", incomeRequestDto.accountId(), userLoggedIn.getId());
             Account account = accountService.searchById(incomeRequestDto.accountId());
             account.validateOwnership(userLoggedIn.getId());
 
             income.setAccount(account);
         }
 
-        return incomeMapper.toDto(incomeRepository.save(income));
+        Income savedIncome = incomeRepository.save(income);
+
+        log.info("Income created successfully with id={} for userId={}",
+                savedIncome.getId(), userLoggedIn.getId());
+
+        return incomeMapper.toDto(savedIncome);
     }
 
     public IncomeResponseDto getIncome(UUID id){

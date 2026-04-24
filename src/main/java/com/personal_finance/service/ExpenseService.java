@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -70,7 +69,6 @@ public class ExpenseService {
     }
 
     public Expense getExpense(UUID id){
-        log.debug("Fetching expense by id={}", id);
 
         return expenseRepository.findById(id)
                 .orElseThrow(() -> {
@@ -80,15 +78,10 @@ public class ExpenseService {
     }
 
     public List<Expense> getAllAccountExpenses(UUID accountId){
-        log.debug("Fetching all expenses for account id={}", accountId);
 
         Account account = accountService.searchById(accountId);
 
-        List<Expense> expenses = expenseRepository.findByAccount(account);
-
-        log.debug("Found {} expenses for account id={}", expenses.size(), accountId);
-
-        return expenses;
+        return expenseRepository.findByAccount(account);
     }
 
     @Transactional
@@ -158,17 +151,14 @@ public class ExpenseService {
 
     public List<ExpenseResponseDto> listNotPaidExpenses(){
         Users userLogged = getLoggedUser();
-        log.debug("Listing not paid expenses for user {}", userLogged.getId());
 
         List<Expense> expenses = expenseRepository.findNotPaidExpenses(userLogged.getId());
 
-        log.debug("Found {} not paid expenses for user {}", expenses.size(), userLogged.getId());
         return expenses.stream().map(expenseMapper::toDto).toList();
     }
 
     public List<ExpenseResponseDto> listNotPaidExpensesByAccount(UUID accountId){
         Users userLogged = getLoggedUser();
-        log.info("User {} requesting not paid expenses for account {}", userLogged.getId(), accountId);
 
         Account account = accountService.searchById(accountId);
 
@@ -176,13 +166,11 @@ public class ExpenseService {
 
         List<Expense> expenses = expenseRepository.findNotPaidExpensesByAccount(accountId);
 
-        log.debug("Found {} not paid expenses for account {}", expenses.size(), accountId);
         return expenses.stream().map(expenseMapper::toDto).toList();
     }
 
     public List<ExpenseResponseDto> listPaidExpenses(){
         Users userLogged = getLoggedUser();
-        log.debug("Listing paid expenses for user {}", userLogged.getId());
 
         List<Expense> expenses = expenseRepository.findPaidExpenses(userLogged.getId());
 
@@ -190,11 +178,7 @@ public class ExpenseService {
     }
 
     public AccountTotalExpenseDto getTotalExpenseAccountValue(UUID accountId){
-        log.info("Calculating total expense value for account {}", accountId);
-
         BigDecimal amount = expenseRepository.totalAccountExpenseValue(accountId);
-
-        log.info("Total expense for account {} is {}", accountId, amount);
 
         return new AccountTotalExpenseDto(accountId, amount);
     }

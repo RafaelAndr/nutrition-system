@@ -12,6 +12,7 @@ import com.personal_finance.repository.UsersRepository;
 import com.personal_finance.security.SecurityService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UsersService {
 
     private final UsersRepository usersRepository;
@@ -30,11 +32,15 @@ public class UsersService {
 
     public void register(UserRequestDto userRequestDto) {
 
+        log.info("Attempting to register user with username '{}'", userRequestDto.username());
+
         if (usersRepository.existsByUsername(userRequestDto.username())) {
+            log.warn("Registration failed: username '{}' already exists", userRequestDto.username());
             throw new EntityAlreadyExistsException("User already exists");
         }
 
         if (!userRequestDto.password().equals(userRequestDto.confirmPassword())) {
+            log.warn("Registration failed for username '{}': passwords do not match", userRequestDto.username());
             throw new AccessForbiddenException("Passwords do not match");
         }
 
@@ -44,7 +50,9 @@ public class UsersService {
         user.setPassword(passwordEncoder.encode(userRequestDto.password()));
         user.setRole(Role.ROLE_CLIENT);
 
-        usersRepository.save(user);
+        Users savedUser = usersRepository.save(user);
+
+        log.info("User '{}' registered successfully with id {}", savedUser.getUsername(), savedUser.getId());
     }
 
     @Transactional(readOnly = true)
@@ -61,20 +69,25 @@ public class UsersService {
     }
 
     public void changePassword(ChangePasswordDto dto) {
-
         Users user = securityService.getUserLoggedIn();
 
+        log.info("User {} is attempting to change password", user.getId());
+
         if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            log.warn("User {} provided incorrect current password", user.getId());
             throw new AccessForbiddenException("Current password is incorrect");
         }
 
         if (passwordEncoder.matches(dto.newPassword(), user.getPassword())) {
+            log.warn("User {} attempted to reuse the same password", user.getId());
             throw new AccessForbiddenException("New password cannot be the same as the current password");
         }
 
         user.setPassword(passwordEncoder.encode(dto.newPassword()));
 
         usersRepository.save(user);
+
+        log.info("User {} changed password successfully", user.getId());
     }
 
     @Transactional(readOnly = true)
@@ -90,7 +103,7 @@ public class UsersService {
     }
 
     public void deleteUser(UUID id) {
-        Users user = searchById(id); // lança exceção se não existir
+        Users user = searchById(id);
         usersRepository.delete(user);
     }
 
