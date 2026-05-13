@@ -50,8 +50,12 @@ public class UsersServiceTest {
                 "123456"
         );
 
+        Users savedUser = new Users();
+        savedUser.setId(UUID.randomUUID());
+
         when(usersRepository.existsByUsername(dto.username())).thenReturn(false);
         when(passwordEncoder.encode(dto.password())).thenReturn("encoded-password");
+        when(usersRepository.save(any())).thenReturn(savedUser);
 
         usersService.register(dto);
 
