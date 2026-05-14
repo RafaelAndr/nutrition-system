@@ -7,11 +7,11 @@ import org.springframework.security.core.userdetails.User;
 
 import java.util.UUID;
 
-public class JwtUserDetails extends User {
+public class CustomUserDetails extends User {
 
     private final Users user;
 
-    public JwtUserDetails(Users user) {
+    public CustomUserDetails(Users user) {
         super(user.getUsername(), user.getPassword(), AuthorityUtils.createAuthorityList(user.getRole().name()));
         this.user = user;
     }
