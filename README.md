@@ -73,6 +73,7 @@ personal-finance/
 │       │   ├── repository/        # Repository tests
 │       │   └── service/           # Service tests
 │       └── resources/             # Test resources
+```
 ## Installation
 
 ### Clone Repository
